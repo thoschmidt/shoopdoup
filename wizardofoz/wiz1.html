@@ -1,0 +1,61 @@
+<head>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.7.2.js">
+    </script>
+    <script>
+        window.onload = function(){
+            var stage = new Kinetic.Stage("container", 578, 200);
+            var layer = new Kinetic.Layer();
+            var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+ 
+            for (var n = 0; n < 6; n++) {
+                // anonymous function to induce scope
+                (function(){
+                    var i = n;
+                    var box = new Kinetic.Shape(function(){
+                        var context = this.getContext();
+                        var x = i * 30 + 150;
+                        var y = i * 18 + 40;
+                        context.beginPath();
+                        context.rect(x, y, 100, 50);
+                        context.lineWidth = 4;
+                        context.strokeStyle = "black";
+                        context.fillStyle = colors[i];
+                        context.fill();
+                        context.stroke();
+                        context.closePath();
+                    });
+ 
+                    box.draggable(true);
+ 
+                    box.on("dragstart", function(){
+                        box.moveToTop();
+                        layer.draw();
+                    });
+                    /*
+                     * dblclick to remove box for desktop app
+                     * and dbltap to remove box for mobile app
+                     */
+                    box.on("dblclick dbltap", function(){
+                        layer.remove(box);
+                        layer.draw();
+                    });
+ 
+                    box.on("mouseover", function(){
+                        document.body.style.cursor = "pointer";
+                    });
+                    box.on("mouseout", function(){
+                        document.body.style.cursor = "default";
+                    });
+ 
+                    layer.add(box);
+                })();
+            }
+ 
+            stage.add(layer);
+        };
+    </script>
+</head>
+<body onmousedown="return false;">
+    <div id="container">
+    </div>
+</body>
