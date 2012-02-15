@@ -71,6 +71,19 @@
 				pandemic: "pandemic.jpg"
 			};
 			
+			var titleText = new Kinetic.Shape(function(){
+				var context = this.getContext();
+				context.beginPath();
+				context.font = "30pt Calibri";
+	            context.fillStyle = "black";
+	            context.textBaseline = "bottom";
+	            context.fillText("Which is More Dangerous?", 500, 70);
+	            context.closePath();
+			});
+			
+			layer.add(titleText);
+			
+			
             loadImages(dangerousImages, drawImages);
  
                 // anonymous function to induce scope
@@ -119,10 +132,6 @@
                     layer.add(box);
  
             		stage.add(layer);
-
-					stage.on("dblclick", function(){
-						alert("No");
-        			});
 			};
     </script>
 </head>
