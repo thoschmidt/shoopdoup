@@ -24,14 +24,6 @@
             }
         }
  
-        function writeMessage(messageLayer, message){
-            var context = messageLayer.getContext();
-            messageLayer.clear();
-            context.font = "18pt Calibri";
-            context.fillStyle = "black";
-            context.fillText(message, 10, 25);
-        }
- 
         function drawImages(images){
             var stage = new Kinetic.Stage("container", window.innerWidth, window.innerHeight);
             var imageLayer = new Kinetic.Layer(window.innerWidth, window.innerHeight);
@@ -63,6 +55,7 @@
             stage.add(imageLayer);
         }
  
+ 		var box;
         window.onload = function(){
             var stage = new Kinetic.Stage("container", window.innerWidth, window.innerHeight);
             var layer = new Kinetic.Layer();
@@ -87,7 +80,7 @@
             loadImages(dangerousImages, drawImages);
  
                 // anonymous function to induce scope
-                    var box = new Kinetic.Shape(function(){
+                    	box = new Kinetic.Shape(function(){
                         var context = this.getContext();
                         var x = window.innerWidth / 2 - 75;
                         var y = window.innerHeight / 2 - 25;
@@ -107,7 +100,7 @@
                         context.closePath();
                     });
  
-                    box.draggable(true);
+                    box.draggableX(true);
  
                     box.on("dragstart", function(){
                         box.moveToTop();
