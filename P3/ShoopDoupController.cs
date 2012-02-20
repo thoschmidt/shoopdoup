@@ -25,7 +25,7 @@ namespace SkeletalTracking
 
 
         double highlightedHandBaseDepth;
-        double depthDeltaForSelection = .15;
+        double depthDeltaForSelection = .3;
 
         public override void processSkeletonFrame(SkeletonData skeleton, Dictionary<int, Target> targets)
         {
@@ -45,13 +45,15 @@ namespace SkeletalTracking
                 double deltaY_right = Math.Abs(rightHand.Position.Y - cur.getYPosition());
 
                 //If we have a hit in a reasonable range, highlight the target
-                if (deltaX_right < 15 && deltaY_right < 15)
+                if (deltaX_right < 60 && deltaY_right < 60)
                 {
-                    Console.WriteLine("Right hand z " + rightHand.Position.Z);
-                    Console.WriteLine("Chest z " + highlightedHandBaseDepth);
+                    Console.WriteLine("Right hand: " + rightHand.Position.Z + " \t Chest: " + highlightedHandBaseDepth);
                     if (Math.Abs(rightHand.Position.Z - highlightedHandBaseDepth) > depthDeltaForSelection)
                     {
-                        cur.setTargetSelected();
+                        if(cur.isHighlighted() || cur.isSelected())
+                        {
+                            cur.setTargetSelected();
+                        }
                     }
                     else
                     {

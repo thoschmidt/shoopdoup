@@ -121,6 +121,9 @@ namespace SkeletalTracking
 
         private Brush _target_color;
         private TextBlock _canvasEl;
+
+        private bool _isSelected;
+        private bool _isHighlighted;
         
  
         public Target(TextBlock target, int givenID)
@@ -140,18 +143,24 @@ namespace SkeletalTracking
         {
             _target_color = new SolidColorBrush(Color.FromRgb(238, 221, 130));
             _canvasEl.Background = new VisualBrush(generateEllipse((double)_canvasEl.GetValue(Canvas.WidthProperty) / 2, _target_color));
+            _isHighlighted = true;
+            _isSelected = false;
         }
 
         public void setTargetSelected()
         {
             _target_color = new SolidColorBrush(Color.FromRgb(34, 139, 34));
             _canvasEl.Background = new VisualBrush(generateEllipse((double)_canvasEl.GetValue(Canvas.WidthProperty) / 2, _target_color));
+            _isHighlighted = false;
+            _isSelected = true;
         }
 
         public void setTargetUnselected()
         {
             _target_color = new SolidColorBrush(Colors.Red);
-            _canvasEl.Background = new VisualBrush(generateEllipse((double)_canvasEl.GetValue(Canvas.WidthProperty) / 2, _target_color)); 
+            _canvasEl.Background = new VisualBrush(generateEllipse((double)_canvasEl.GetValue(Canvas.WidthProperty) / 2, _target_color));
+            _isHighlighted = false;
+            _isSelected = false;
         }
 
         public void hideTarget()
@@ -166,6 +175,16 @@ namespace SkeletalTracking
         public bool isHidden()
         {
             return _canvasEl.Visibility != Visibility.Visible;
+        }
+
+        public bool isHighlighted()
+        {
+            return _isHighlighted;
+        }
+
+        public bool isSelected()
+        {
+            return _isSelected;
         }
 
         public double getXPosition()
