@@ -1,0 +1,134 @@
+<head>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.7.2.js">
+    </script>
+    <script>
+		
+		var leftImage = new Image();
+		var rightImage = new Image();
+		var imageLayer = new Kinetic.Layer();
+        function loadImages(sources, callback){
+            var images = {};
+            var loadedImages = 0;
+            var numImages = 0;
+            for (var src in sources) {
+                numImages++;
+            }
+            for (var src in sources) {
+                images[src] = new Image();
+                images[src].onload = function(){
+                    if (++loadedImages >= numImages) {
+                        callback(images);
+                    }
+                };
+                images[src].src = sources[src];
+            }
+        }
+ 
+        function drawImages(images){
+            var stage = new Kinetic.Stage("container", window.innerWidth, window.innerHeight);
+            var imageLayer = new Kinetic.Layer(window.innerWidth, window.innerHeight);
+ 
+            // darth vader
+            var terroristImg = new Kinetic.Shape(function(){
+                var context = this.getContext();
+                context.drawImage(images.terrorist, 150, 137);
+                // draw invisible detectable path for image
+                context.beginPath();
+                context.rect(150, 137, 315, 480);
+                context.closePath();
+            });
+
+            imageLayer.add(terroristImg);
+ 
+            // yoda
+            var pandemicImg = new Kinetic.Shape(function(){
+                var context = this.getContext();
+                context.drawImage(images.pandemic, 1000, 300, 629 * .5, 498 * .5);
+                // draw invisible detectable path for image
+                context.beginPath();
+                context.rect(1000, 300, 629 * .66, 498 * .66);
+                context.closePath();
+            });
+
+            imageLayer.add(pandemicImg);
+ 
+            stage.add(imageLayer);
+        }
+ 
+ 		var box;
+        window.onload = function(){
+            var stage = new Kinetic.Stage("container", window.innerWidth, window.innerHeight);
+            var layer = new Kinetic.Layer();
+            var dangerousImages = {
+				terrorist: "terrorist.jpg",
+				pandemic: "pandemic.jpg"
+			};
+			
+			var titleText = new Kinetic.Shape(function(){
+				var context = this.getContext();
+				context.beginPath();
+				context.font = "30pt Calibri";
+	            context.fillStyle = "black";
+	            context.textBaseline = "bottom";
+	            context.fillText("Which is More Dangerous?", 500, 70);
+	            context.closePath();
+			});
+			
+			layer.add(titleText);
+			
+			
+            loadImages(dangerousImages, drawImages);
+ 
+                // anonymous function to induce scope
+                    	box = new Kinetic.Shape(function(){
+                        var context = this.getContext();
+                        var x = window.innerWidth / 2 - 75;
+                        var y = window.innerHeight / 2 - 25;
+                        context.beginPath();
+                        context.rect(x, y, 150, 50);
+                        context.lineWidth = 4;
+                        context.strokeStyle = "black";
+                        context.fillStyle = "red";
+                        context.fill();
+                        context.stroke();
+
+                        context.font = "14pt Calibri";
+                        context.fillStyle = "black";
+                        context.textBaseline = "bottom";
+                        context.fillText("More Dangerous", x + 10, y + 30);
+
+                        context.closePath();
+                    });
+ 
+                    box.draggableX(true);
+ 
+                    box.on("dragstart", function(){
+                        box.moveToTop();
+                        layer.draw();
+                    });
+                    /*
+                     * dblclick to remove box for desktop app
+                     * and dbltap to remove box for mobile app
+                     */
+                    /*box.on("dblclick dbltap", function(){
+                        layer.remove(box);
+                        layer.draw();
+                    });*/
+ 
+                    box.on("mouseover", function(){
+                        document.body.style.cursor = "pointer";
+                    });
+                    box.on("mouseout", function(){
+                        document.body.style.cursor = "default";
+                    });
+ 
+                    layer.add(box);
+ 
+            		stage.add(layer);
+			};
+    </script>
+</head>
+<body onmousedown="return false;">
+    <div id="container">
+	</div>
+</body>

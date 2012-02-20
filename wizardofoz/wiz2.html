@@ -1,0 +1,89 @@
+<head>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.7.2.js">
+    </script>
+    <script>
+        window.onload = function(){
+        	var stageWidth = 800;
+        	var stageHeight = 800;
+            var stage = new Kinetic.Stage("container", stageWidth, stageHeight);
+            var layer = new Kinetic.Layer();
+            var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+            var choices = ["healthcare", "poverty", "environment", "disease"];
+ 
+            for (var n = 0; n < choices.length; n++) {
+                // anonymous function to induce scope
+                (function(){
+                	var i = n;
+                    var box = new Kinetic.Shape(function(){
+                        var context = this.getContext();
+                        var x = 150;
+                        var y = i * 70 + 40;
+                        context.beginPath();
+                        context.rect(x, y, 100, 50);
+                        context.lineWidth = 4;
+                        context.strokeStyle = "black";
+                        context.fillStyle = colors[i];
+                        context.fill();
+                        context.stroke();
+                        
+                        context.font = "12pt Calibri";
+                        context.fillStyle = "black";
+                        context.textBaseline = "bottom";
+                        context.fillText(choices[i], x + 10, y + 30);
+                        context.closePath();
+                    });
+                    
+                    var stretchBox = new Kinetic.Shape(function() {
+                    	var context = this.getContext();
+                    	var x = 0;
+                    	var y = i * 70 + 60;
+                    	context.beginPath();
+                    	context.rect(x, y, 1, 10);
+                    	context.fillStyle = colors[i];
+                    	context.fill();
+                    	context.closePath();
+                    });
+                    
+                    stretchBox.setScale(box.x + 150, 1);
+ 
+                    box.draggableX(true);
+ 
+                    box.on("dragstart", function(){
+                        box.moveToTop();
+                        layer.draw();
+                    });
+                    
+                    box.on("dragmove", function(){
+                        stretchBox.setScale(box.x + 150, 1);
+						layer.draw();
+					});
+ 
+                    box.on("mouseover", function(){
+                        document.body.style.cursor = "pointer";
+                    });
+                    box.on("mouseout", function(){
+                        document.body.style.cursor = "default";
+                    });
+ 
+                    layer.add(box);
+                    layer.add(stretchBox);
+                    box.moveToTop();
+                })();
+            }
+ 
+            stage.add(layer);
+        };
+    </script>
+</head>
+<body onmousedown="return false;">
+	<div style=" width: 800px;">
+		<h1 style="text-align:center">How much do you care about the following issues?</h1>
+		<div>
+			<p style="float: left">A little</p>
+			<p style="float: right">A lot</p>
+		</div>
+	</div>
+	<div  style="clear: both;"></div>
+    <div id="container">
+    </div>
+</body>
