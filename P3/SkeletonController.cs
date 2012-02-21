@@ -163,6 +163,17 @@ namespace SkeletalTracking
             _isSelected = false;
         }
 
+        public void setTargetTranslucent()
+        {
+            _target_color = new SolidColorBrush(Colors.Red);
+            _target_color.Opacity = .5;
+
+            _canvasEl.Background = new VisualBrush(generateEllipse((double)_canvasEl.GetValue(Canvas.WidthProperty) / 2, _target_color));
+            _isHighlighted = false;
+            _isSelected = false;
+            
+        }
+
         public void hideTarget()
         {
             _canvasEl.Visibility = Visibility.Hidden;

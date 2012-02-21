@@ -12,10 +12,10 @@ using Coding4Fun.Kinect.Wpf;
 
 namespace SkeletalTracking
 {
-    class ShoopDoupController : SkeletonController
+    class SelectionController : SkeletonController
     {
 
-        public ShoopDoupController(MainWindow win)
+        public SelectionController(MainWindow win)
             : base(win)
         {
             rightHandTimer = null;
@@ -50,13 +50,9 @@ namespace SkeletalTracking
                     Console.WriteLine("Right hand: " + rightHand.Position.Z + " \t Chest: " + highlightedHandBaseDepth);
                     if (Math.Abs(rightHand.Position.Z - highlightedHandBaseDepth) > depthDeltaForSelection)
                     {
-                        if (cur.isHighlighted() || cur.isSelected())
+                        if(cur.isHighlighted() || cur.isSelected())
                         {
                             cur.setTargetSelected();
-                        }
-                        else
-                        {
-                            cur.setTargetTranslucent();
                         }
                     }
                     else

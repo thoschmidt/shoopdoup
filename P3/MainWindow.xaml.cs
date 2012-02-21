@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -33,8 +34,19 @@ namespace SkeletalTracking
         Runtime nui;
 
         //Targets and skeleton controller
-        SkeletonController exampleController;
-        ShoopDoupController yourController1;
+        ShoopDoupController shoopDoupController;
+        SelectionController selectionController;
+
+        DtwGestureRecognizer _dtw = new DtwGestureRecognizer(12, 0.6, 2, 2, 10);
+        ArrayList _video = new ArrayList();
+        private int _totalFrames;
+        private int _flipFlop;
+        private int _lastFrames;
+        private DateTime _lastTime = DateTime.MaxValue;
+        private const int BufferSize = 32;
+        private const int MinimumFrames = 6;
+        private const int Ignore = 2;
+
 
         //Holds the currently active controller
         SkeletonController currentController;
@@ -46,12 +58,13 @@ namespace SkeletalTracking
         public float k_yMaxJointScale = 1.5f;
 
         int i;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetupKinect();
-            exampleController = new SkeletonController(this);
-            yourController1 = new ShoopDoupController(this);
-            currentController = exampleController;
+            shoopDoupController = new ShoopDoupController(this);
+            selectionController = new SelectionController(this);
+            currentController = shoopDoupController;
             InitTargets();
             i = 0;
         }
@@ -87,6 +100,10 @@ namespace SkeletalTracking
 
                 //add event to receive skeleton data
                 nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+                nui.SkeletonFrameReady += NuiSkeletonFrameReady;
+                nui.SkeletonFrameReady += SkeletonExtractSkeletonFrameReady;
+
+                Skeleton2DDataExtract.Skeleton2DdataCoordReady += NuiSkeleton2DdataCoordReady;
 
                 //add event to receive video data
                 nui.VideoFrameReady += new EventHandler<ImageFrameReadyEventArgs>(nui_VideoFrameReady);
@@ -104,6 +121,9 @@ namespace SkeletalTracking
 
                 //Open the video stream
                 nui.VideoStream.Open(ImageStreamType.Video, 2, ImageResolution.Resolution640x480, ImageType.Color);
+
+                LoadGesturesFromFile(System.AppDomain.CurrentDomain.BaseDirectory + "RightHandSwipeLeft.txt");
+                LoadGesturesFromFile(System.AppDomain.CurrentDomain.BaseDirectory + "RightHandSwipeRight.txt");
                 
                 //Force video to the background
                 Canvas.SetZIndex(image1, -10000);
@@ -131,9 +151,51 @@ namespace SkeletalTracking
             {
                 //set positions on our joints of interest (already defined as Ellipse objects in the xaml)
                 SetEllipsePosition(rightEllipse, skeleton.Joints[JointID.HandRight]);
+                SetImagePosition(hand, skeleton.Joints[JointID.HandRight]);
                 currentController.processSkeletonFrame(skeleton, targets);
 
             }
+        }
+
+        private void NuiSkeleton2DdataCoordReady(object sender, Skeleton2DdataCoordEventArgs a)
+        {
+            // We need a sensible number of frames before we start attempting to match gestures against remembered sequences
+            if (_video.Count > MinimumFrames)
+            {
+                ////Debug.WriteLine("Reading and video.Count=" + video.Count);
+                string s = _dtw.Recognize(_video);
+
+                //results.Text = "Recognised as: " + s;
+                if (!s.Contains("__UNKNOWN"))
+                {
+                    // There was no match so reset the buffer
+                    Console.WriteLine("Found " + s);
+                    _video = new ArrayList();
+                }
+            }
+
+            // Ensures that we remember only the last x frames
+            if (_video.Count > BufferSize)
+            {
+                    // Remove the first frame in the buffer
+                    _video.RemoveAt(0);
+            }
+
+            // Decide which skeleton frames to capture. Only do so if the frames actually returned a number. 
+            // For some reason my Kinect/PC setup didn't always return a double in range (i.e. infinity) even when standing completely within the frame.
+            // TODO Weird. Need to investigate this
+            if (!double.IsNaN(a.GetPoint(0).X))
+            {
+                // Optionally register only 1 frame out of every n
+                _flipFlop = (_flipFlop + 1) % Ignore;
+                if (_flipFlop == 0)
+                {
+                    _video.Add(a.GetCoords());
+                }
+            }
+
+            // Update the debug window with Sequences information
+            //dtwTextOutput.Text = _dtw.RetrieveText();
         }
 
         private void SetEllipsePosition(Ellipse ellipse, Joint joint)
@@ -150,6 +212,15 @@ namespace SkeletalTracking
             }
         }
 
+        private void SetImagePosition(Image image, Joint joint)
+        {
+            var scaledJoint = joint.ScaleTo(640, 480, k_xMaxJointScale, k_yMaxJointScale);
+
+            Canvas.SetLeft(image, scaledJoint.Position.X - (double)image.GetValue(Canvas.WidthProperty) / 2);
+            Canvas.SetTop(image, scaledJoint.Position.Y - (double)image.GetValue(Canvas.WidthProperty) / 2);
+            Canvas.SetZIndex(image, (int)-Math.Floor(scaledJoint.Position.Z * 100));
+        }
+
 
 
         private void Window_Closed(object sender, EventArgs e)
@@ -162,16 +233,108 @@ namespace SkeletalTracking
         {
             if (e.Key == Key.D1)
             {
-                currentController = exampleController;
+                currentController = shoopDoupController;
                 currentController.controllerActivated(targets);
             }
 
             if (e.Key == Key.D2)
             {
-                currentController = yourController1;
+                currentController = selectionController;
                 currentController.controllerActivated(targets);
             }
+        }
 
+        private static void SkeletonExtractSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            SkeletonFrame skeletonFrame = e.SkeletonFrame;
+            foreach (SkeletonData data in skeletonFrame.Skeletons)
+            {
+                Skeleton2DDataExtract.ProcessData(data);
+            }
+        }
+
+        /// <summary>
+        /// Runds every time a skeleton frame is ready. Updates the skeleton canvas with new joint and polyline locations.
+        /// </summary>
+        /// <param name="sender">The sender object</param>
+        /// <param name="e">Skeleton Frame Event Args</param>
+        private void NuiSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+            SkeletonFrame skeletonFrame = e.SkeletonFrame;
+            int iSkeleton = 0;
+            var brushes = new Brush[6];
+            brushes[0] = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+            brushes[1] = new SolidColorBrush(Color.FromRgb(0, 255, 0));
+            brushes[2] = new SolidColorBrush(Color.FromRgb(64, 255, 255));
+            brushes[3] = new SolidColorBrush(Color.FromRgb(255, 255, 64));
+            brushes[4] = new SolidColorBrush(Color.FromRgb(255, 64, 255));
+            brushes[5] = new SolidColorBrush(Color.FromRgb(128, 128, 255));
+
+        }
+
+        /// <summary>
+        /// Called every time a video (RGB) frame is ready
+        /// </summary>
+        /// <param name="sender">The sender object</param>
+        /// <param name="e">Image Frame Ready Event Args</param>
+        private void NuiColorFrameReady(object sender, ImageFrameReadyEventArgs e)
+        {
+            // 32-bit per pixel, RGBA image
+            PlanarImage image = e.ImageFrame.Image;
+        }
+
+
+        //from DTW
+        /// <summary>
+        /// Opens the sent text file and creates a _dtw recorded gesture sequence
+        /// Currently not very flexible and totally intolerant of errors.
+        /// </summary>
+        /// <param name="fileLocation">Full path to the gesture file</param>
+        public void LoadGesturesFromFile(string fileLocation)
+        {
+            int itemCount = 0;
+            string line;
+            string gestureName = String.Empty;
+
+            // TODO I'm defaulting this to 12 here for now as it meets my current need but I need to cater for variable lengths in the future
+            ArrayList frames = new ArrayList();
+            double[] items = new double[12];
+
+            // Read the file and display it line by line.
+            System.IO.StreamReader file = new System.IO.StreamReader(fileLocation);
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.StartsWith("@"))
+                {
+                    gestureName = line;
+                    continue;
+                }
+
+                if (line.StartsWith("~"))
+                {
+                    frames.Add(items);
+                    itemCount = 0;
+                    items = new double[12];
+                    continue;
+                }
+
+                if (!line.StartsWith("----"))
+                {
+                    items[itemCount] = Double.Parse(line);
+                }
+
+                itemCount++;
+
+                if (line.StartsWith("----"))
+                {
+                    _dtw.AddOrUpdate(frames, gestureName);
+                    frames = new ArrayList();
+                    gestureName = String.Empty;
+                    itemCount = 0;
+                }
+            }
+
+            file.Close();
         }
     }
 

@@ -64,7 +64,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DtwGestureRecognizer.cs" />
+    <Compile Include="SelectionController.cs" />
     <Compile Include="ShoopDoupController.cs" />
+    <Compile Include="Skeleton2DdataCoordEventArgs.cs" />
+    <Compile Include="Skeleton2DDataExtract.cs" />
     <Compile Include="SkeletonController.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +103,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="osx-hand.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
