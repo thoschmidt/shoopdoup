@@ -153,8 +153,6 @@ namespace SkeletalTracking
         public override void controllerActivated(Dictionary<int, Target> targets)
         {
 
-            /* YOUR CODE HERE */
-
         }
     }
 }
