@@ -13,7 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
-using Coding4Fun.Kinect.Wpf; 
+using Coding4Fun.Kinect.Wpf;
+using MySql.Data.MySqlClient;
 
 namespace SkeletalTracking
 {
@@ -28,7 +29,39 @@ namespace SkeletalTracking
         public MainWindow()
         {
             InitializeComponent();
+            LoadImagesToDictionary();
         }
+
+        private void LoadImagesToDictionary()
+        {
+            connection = new MySqlConnection();
+            movieDatabase = new Dictionary<string, string>();
+
+            connection.ConnectionString = "server=50.22.41.96;" + "database=tschmidt_cs247;" + "uid=tschmidt_tom;" + "password=cs247forlife;";
+            connection.Open();
+
+            MySqlCommand command = connection.CreateCommand();
+            command.CommandText = "select * from movies";
+
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                movieDatabase.Add((string)reader.GetValue(1), (string)reader.GetValue(2));
+            }
+
+            connection.Close();
+        }
+
+        private void LoadImage(Image imageTarget, string sourceUri)
+        {
+            BitmapImage bitImage = new BitmapImage();
+            bitImage.BeginInit();
+            bitImage.UriSource = new Uri(sourceUri, UriKind.RelativeOrAbsolute);
+            bitImage.EndInit();
+            imageTarget.Stretch = Stretch.Fill;
+            imageTarget.Source = bitImage;
+        }
+
 
         //Kinect Runtime
         Runtime nui;
@@ -46,6 +79,10 @@ namespace SkeletalTracking
         private const int BufferSize = 32;
         private const int MinimumFrames = 6;
         private const int Ignore = 2;
+
+        //SQL stuff
+        MySqlConnection connection;
+        Dictionary<String, String> movieDatabase;
 
 
         //Holds the currently active controller
