@@ -37,6 +37,12 @@ namespace SkeletalTracking
                 Target cur = target.Value;
                 int targetID = cur.id; //ID in range [1..5]
 
+                if (cur.id == 2)
+                {
+                    Set
+                    continue;
+                }
+
                 //Scale the joints to the size of the window
                 Joint rightHand = skeleton.Joints[JointID.HandRight].ScaleTo(640, 480, window.k_xMaxJointScale, window.k_yMaxJointScale);
 
