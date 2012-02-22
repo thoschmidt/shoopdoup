@@ -39,7 +39,6 @@ namespace SkeletalTracking
 
                 if (cur.id == 2)
                 {
-                    Set
                     continue;
                 }
 

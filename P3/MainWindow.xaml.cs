@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
 using Coding4Fun.Kinect.Wpf;
 using MySql.Data.MySqlClient;
+using ShoopDoup;
 
 namespace SkeletalTracking
 {
@@ -29,38 +30,8 @@ namespace SkeletalTracking
         public MainWindow()
         {
             InitializeComponent();
-            LoadImagesToDictionary();
         }
 
-        private void LoadImagesToDictionary()
-        {
-            connection = new MySqlConnection();
-            movieDatabase = new Dictionary<string, string>();
-
-            connection.ConnectionString = "server=50.22.41.96;" + "database=tschmidt_cs247;" + "uid=tschmidt_tom;" + "password=cs247forlife;";
-            connection.Open();
-
-            MySqlCommand command = connection.CreateCommand();
-            command.CommandText = "select * from movies";
-
-            MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                movieDatabase.Add((string)reader.GetValue(1), (string)reader.GetValue(2));
-            }
-
-            connection.Close();
-        }
-
-        private void LoadImage(Image imageTarget, string sourceUri)
-        {
-            BitmapImage bitImage = new BitmapImage();
-            bitImage.BeginInit();
-            bitImage.UriSource = new Uri(sourceUri, UriKind.RelativeOrAbsolute);
-            bitImage.EndInit();
-            imageTarget.Stretch = Stretch.Fill;
-            imageTarget.Source = bitImage;
-        }
 
 
         //Kinect Runtime
@@ -81,15 +52,15 @@ namespace SkeletalTracking
         private const int Ignore = 2;
 
         //SQL stuff
-        MySqlConnection connection;
+        
         Dictionary<String, String> movieDatabase;
 
 
         //Holds the currently active controller
         SkeletonController currentController;
-       
-        Dictionary<int, Target> targets = new Dictionary<int, Target>();
 
+        ImageManager imageManager;
+      
         //Scaling constants
         public float k_xMaxJointScale = 1.5f;
         public float k_yMaxJointScale = 1.5f;
@@ -102,23 +73,9 @@ namespace SkeletalTracking
             shoopDoupController = new ShoopDoupController(this);
             selectionController = new SelectionController(this);
             currentController = shoopDoupController;
-            InitTargets();
-            i = 0;
-        }
         
-        private void InitTargets()
-        {
-            targets.Add(1, new Target(target1, 1));
-            targets.Add(2, new Target(target2, 2));
-            targets.Add(3, new Target(target3, 3));
-            targets.Add(4, new Target(target4, 4));
-            targets.Add(5, new Target(target5, 5));
-            currentController.controllerActivated(targets);
-            Canvas.SetZIndex(target1, 100);
-            Canvas.SetZIndex(target2, 100);
-            Canvas.SetZIndex(target3, 100);
-            Canvas.SetZIndex(target4, 100);
-            Canvas.SetZIndex(target5, 100);
+            
+            i = 0;
         }
 
         private void SetupKinect()
@@ -187,9 +144,9 @@ namespace SkeletalTracking
             if(skeleton != null)
             {
                 //set positions on our joints of interest (already defined as Ellipse objects in the xaml)
-                SetEllipsePosition(rightEllipse, skeleton.Joints[JointID.HandRight]);
+
                 SetImagePosition(hand, skeleton.Joints[JointID.HandRight]);
-                currentController.processSkeletonFrame(skeleton, targets);
+                currentController.processSkeletonFrame(skeleton, null);
 
             }
         }
@@ -207,6 +164,7 @@ namespace SkeletalTracking
                 {
                     // There was no match so reset the buffer
                     Console.WriteLine("Found " + s);
+                    ((ShoopDoupController)currentController).resetTargets();
                     _video = new ArrayList();
                 }
             }
@@ -271,13 +229,11 @@ namespace SkeletalTracking
             if (e.Key == Key.D1)
             {
                 currentController = shoopDoupController;
-                currentController.controllerActivated(targets);
             }
 
             if (e.Key == Key.D2)
             {
                 currentController = selectionController;
-                currentController.controllerActivated(targets);
             }
         }
 
@@ -372,6 +328,11 @@ namespace SkeletalTracking
             }
 
             file.Close();
+        }
+
+        private void imageTarget1_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+
         }
     }
 
