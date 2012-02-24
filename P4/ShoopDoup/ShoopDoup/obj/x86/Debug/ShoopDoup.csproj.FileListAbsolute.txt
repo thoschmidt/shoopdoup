@@ -1,0 +1,15 @@
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\MainWindow.baml
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\MainWindow.g.cs
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\App.g.cs
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ShoopDoup_MarkupCompile.cache
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ShoopDoup.g.resources
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ShoopDoup.Properties.Resources.resources
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\bin\Debug\ShoopDoup.exe
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\bin\Debug\ShoopDoup.pdb
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ShoopDoup.exe
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\obj\x86\Debug\ShoopDoup.pdb
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Aaron\Documents\shoopdoup\P4\ShoopDoup\ShoopDoup\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
