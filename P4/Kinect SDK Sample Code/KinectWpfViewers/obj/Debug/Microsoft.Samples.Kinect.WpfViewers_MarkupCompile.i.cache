@@ -1,0 +1,20 @@
+﻿Microsoft.Samples.Kinect.WpfViewers
+
+
+library
+C#
+.cs
+C:\Users\Aaron\Documents\shoopdoup\P4\Kinect SDK Sample Code\KinectWpfViewers\obj\Debug\
+Microsoft.Samples.Kinect.WpfViewers
+none
+false
+DEBUG;TRACE
+
+3173858053
+
+8442923025
+13673347688
+KinectDepthViewer.xaml;KinectColorViewer.xaml;KinectDiagnosticViewer.xaml;
+
+True
+
